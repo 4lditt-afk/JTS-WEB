@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - JTS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        :root {
+            --bg-main: #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --primary: #214080; 
+            --primary-hover: #1a3366;
+            --accent: #d93829; 
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            background-color: var(--bg-main); color: var(--text-main); 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-image: radial-gradient(circle at 15% 50%, rgba(33, 64, 128, 0.05), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(53, 130, 67, 0.05), transparent 25%);
+        }
+        
+        .login-card {
+            background: var(--glass-bg); padding: 2.5rem; border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 400px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        /* Pengaturan ukuran dan posisi Logo di halaman Login */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .logo-center { 
+            height: 85px; /* Dibuat lebih besar agar jelas */
+            width: auto; 
+            object-fit: contain; 
+            transition: transform 0.3s ease;
+        }
+        .logo-center:hover {
+            transform: scale(1.05); /* Efek sedikit membesar saat disentuh mouse */
+        }
+
+        h2 { text-align: center; margin-bottom: 1.5rem; color: var(--text-main); font-weight: 700; font-size: 1.4rem; }
+        
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .form-group input { 
+            width: 100%; padding: 0.8rem 1rem; background: #fff; color: var(--text-main); 
+            border: 1px solid rgba(0,0,0,0.15); border-radius: 8px; transition: all 0.2s;
+        }
+        .form-group input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(33, 64, 128, 0.15); }
+        
+        .btn-primary { 
+            width: 100%; padding: 0.8rem; margin-top: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover)); 
+            color: #fff; border: none; border-radius: 8px; font-weight: 600; 
+            cursor: pointer; transition: opacity 0.3s ease; font-size: 1rem;
+        }
+        .btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(33, 64, 128, 0.2); }
+        
+        .auth-switch { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .auth-switch span { color: var(--accent); cursor: pointer; font-weight: 600; transition: color 0.2s; }
+        .auth-switch span:hover { color: #b72a1e; text-decoration: underline; }
+
+        .back-link { display: block; text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted); text-decoration: none; font-weight: 500;}
+        .back-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <a href="index.html">
+                <img src="logo.jpg" alt="Logo JTS" class="logo-center">
+            </a>
+        </div>
+        
+        <h2 id="auth-title">Masuk Akun JTS</h2>
+        
+        <form id="auth-form" onsubmit="handleAuth(event)">
+            <div class="form-group" id="name-group" style="display: none;">
+                <label>Nama Lengkap</label>
+                <input type="text" id="reg-name" placeholder="Nama sesuai absen">
+            </div>
+            <div class="form-group" id="class-group" style="display: none;">
+                <label>Kelas</label>
+                <input type="text" id="reg-class" placeholder="Contoh: XII IPA 1">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="auth-username" required placeholder="Gunakan huruf kecil">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="auth-password" required placeholder="Masukkan kata sandi">
+            </div>
+            <button type="submit" class="btn-primary" id="auth-btn">Masuk</button>
+        </form>
+        
+        <div class="auth-switch" id="auth-switch-text">
+            Belum punya akun? <span onclick="switchAuthMode()">Daftar sekarang</span>
+        </div>
+        
+        <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+    </div>
+
+    <script>
+        // Cek jika sudah login, langsung lempar ke beranda
+        if (localStorage.getItem('j3s_user')) {
+            window.location.href = 'index.html';
+        }
+
+        let isLoginMode = true;
+
+        const switchAuthMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Masuk Akun JTS" : "Daftar Akun Baru";
+            document.getElementById('auth-btn').innerText = isLoginMode ? "Masuk" : "Daftar";
+            document.getElementById('name-group').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('class-group').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('reg-name').required = !isLoginMode;
+            document.getElementById('reg-class').required = !isLoginMode;
+            document.getElementById('auth-switch-text').innerHTML = isLoginMode 
+                ? `Belum punya akun? <span onclick="switchAuthMode()">Daftar</span>`
+                : `Sudah punya akun? <span onclick="switchAuthMode()">Masuk</span>`;
+        };
+
+        const handleAuth = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('auth-btn');
+            btn.innerText = "Memproses...";
+            btn.disabled = true;
+
+            const url = isLoginMode ? '/api/login' : '/api/register';
+            const body = {
+                username: document.getElementById('auth-username').value.toLowerCase().trim(),
+                password: document.getElementById('auth-password').value
+            };
+            if (!isLoginMode) {
+                body.name = document.getElementById('reg-name').value;
+                body.kelas = document.getElementById('reg-class').value;
+            }
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    if (isLoginMode) {
+                        // Jika login sukses, simpan data dan pindah ke index.html
+                        localStorage.setItem('j3s_user', JSON.stringify(data.user));
+                        window.location.href = 'index.html';
+                    } else {
+                        // Jika register sukses, minta user login
+                        alert("Pendaftaran berhasil! Silakan masuk dengan akun barumu.");
+                        switchAuthMode();
+                    }
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) { 
+                alert("Server error. Pastikan server Node.js berjalan."); 
+            } finally {
+                btn.innerText = isLoginMode ? "Masuk" : "Daftar";
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>

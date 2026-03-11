@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "username": "alekocak",
+      "password": "1234",
+      "name": "Alditya Anmen Pribadi",
+      "kelas": "XII-9"
+    },
+    {
+      "username": "andibalap",
+      "password": "1234",
+      "name": "M. Andi Hidayatullah",
+      "kelas": "XII 9"
+    }
+  ],
+  "files": []
+}

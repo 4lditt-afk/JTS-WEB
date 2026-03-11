@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTS - Jasa Titip Sekolah</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        :root {
+            var(--bg-main): #f8fafc;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --primary: #214080; 
+            --primary-hover: #1a3366;
+            --accent: #d93829; 
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444; 
+            --success: #358243; 
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            background-color: #f8fafc; color: var(--text-main); line-height: 1.6; min-height: 100vh;
+            background-image: radial-gradient(circle at 15% 50%, rgba(33, 64, 128, 0.05), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(53, 130, 67, 0.05), transparent 25%);
+        }
+        
+        header { background: var(--glass-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        
+        .logo-link { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 50px; width: auto; object-fit: contain; }
+
+        .nav-actions { display: flex; align-items: center; gap: 1.5rem; }
+        .auth-status { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 1rem; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; }
+        
+        /* Tombol Navigasi Login */
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 0.5rem 1.2rem; border-radius: 8px; transition: all 0.3s ease; font-weight: 600; text-decoration: none;}
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        .icon-btn { background: none; color: var(--text-main); font-size: 1.2rem; font-weight: 600; position: relative; display: flex; align-items: center; gap: 0.5rem; transition: color 0.3s ease; }
+        .icon-btn:hover { color: var(--primary); }
+        .badge { background: linear-gradient(135deg, var(--accent), #ff7f50); color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; position: absolute; top: -8px; right: -10px; font-weight: bold; }
+        
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .section-title { margin-bottom: 2rem; font-size: 1.75rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; color: var(--text-main); }
+        .section-title::after { content: ""; height: 2px; flex-grow: 1; background: linear-gradient(to right, var(--primary), transparent); border-radius: 2px; }
+        
+        /* Product Cards */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+        .product-card { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: var(--primary); }
+        .product-img { width: 100%; height: 200px; object-fit: cover; transition: transform 0.5s ease; }
+        .product-card:hover .product-img { transform: scale(1.05); }
+        .product-info { padding: 1.5rem; }
+        .product-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .product-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; height: 40px; }
+        .product-price { font-weight: 800; color: var(--success); font-size: 1.25rem; margin-bottom: 1.5rem; }
+        
+        .btn-primary { width: 100%; padding: 0.8rem; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; border-radius: 8px; font-weight: 600; transition: opacity 0.3s ease; }
+        .btn-primary:hover { opacity: 0.9; }
+        
+        /* Modals & Keranjang */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--glass-bg); border: 1px solid var(--glass-border); width: 90%; max-width: 450px; border-radius: 20px; padding: 2.5rem; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); transform: translateY(20px); transition: transform 0.3s ease; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .close-modal { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.5rem; color: var(--text-muted); background: none; transition: color 0.3s ease; }
+        .close-modal:hover { color: var(--danger); }
+        
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .form-group textarea { width: 100%; padding: 0.8rem 1rem; background: rgba(255, 255, 255, 0.9); color: var(--text-main); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; }
+        .form-group textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(33, 64, 128, 0.2); }
+        
+        .cart-items { max-height: 40vh; overflow-y: auto; margin-bottom: 1.5rem; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--glass-border); }
+        .qty-control { display: flex; align-items: center; gap: 0.8rem; background: rgba(0,0,0,0.05); padding: 0.3rem; border-radius: 8px;}
+        .qty-btn { background: transparent; color: var(--text-main); width: 24px; height: 24px; font-weight: bold; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 800; padding: 1rem 0; color: var(--success); }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo-link">
+                <img src="logo.jpg" alt="Logo JTS" class="logo-img">
+            </a>
+            
+            <div class="nav-actions">
+                <div class="auth-status" id="auth-status"></div>
+                <button class="icon-btn" onclick="toggleModal('cart-modal')">
+                    🛒 <span class="badge" id="cart-badge">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h2 class="section-title">Kantin JTS</h2>
+        <div class="product-grid" id="food-grid"></div>
+        <h2 class="section-title">Layanan JTS & Fotokopi</h2>
+        <div class="product-grid" id="copy-grid"></div>
+    </main>
+
+    <div class="modal-overlay" id="cart-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="close-modal" onclick="toggleModal('cart-modal')">&times;</button>
+            <h2 style="margin-bottom: 1.5rem;">Keranjang Pesanan</h2>
+            <div class="cart-items" id="cart-items-container"></div>
+            <div class="cart-total"><span>Total:</span><span id="cart-total-price">Rp 0</span></div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+                <label>Catatan Tambahan (Opsional)</label>
+                <textarea id="buyer-notes" rows="2" placeholder="Contoh: Pedas, dipisah, dll."></textarea>
+            </div>
+            <button class="btn-primary" onclick="processCheckout()" style="background: linear-gradient(135deg, var(--success), #296834);">
+                Kirim Pesanan (WhatsApp)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('j3s_user')) || null;
+        let cart = [];
+
+        // --- AUTH LOGIC (Diarahkan ke login.html) ---
+        const checkAuthStatus = () => {
+            const statusDiv = document.getElementById('auth-status');
+            if (currentUser) {
+                statusDiv.innerHTML = `<span>Hai, <strong>${currentUser.name}</strong></span> <button onclick="logout()" style="border: 1px solid var(--danger); color: var(--danger); padding: 0.3rem 0.8rem; border-radius: 6px; background: transparent; font-size: 0.85rem; margin-left: 10px; font-weight: bold;">Keluar</button>`;
+            } else {
+                statusDiv.innerHTML = `<a href="login.html" class="btn-outline">Masuk / Daftar</a>`;
+            }
+        };
+
+        const logout = () => { 
+            localStorage.removeItem('j3s_user'); 
+            currentUser = null; 
+            cart = []; 
+            checkAuthStatus(); 
+            updateCartUI(); 
+        };
+
+        // --- PRODUCTS & CART ---
+        const products = [
+            { id: 1, name: "Nasi Goreng Spesial", price: 12000, category: "food", image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&q=80&w=400", desc: "Nasi goreng ayam telur." },
+            { id: 2, name: "Ayam Geprek", price: 15000, category: "food", image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&q=80&w=400", desc: "Ayam krispi sambal bawang." },
+            { id: 4, name: "Jasa Suruh-Suruh", price: 2000, category: "copy", image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=400", desc: "Titip belikan barang/makanan." },
+            { id: 5, name: "Print HVS (Hitam Putih)", price: 500, category: "copy", image: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&q=80&w=400", desc: "Harga per lembar A4/F4." }
+        ];
+
+        const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+
+        const renderProducts = () => {
+            products.forEach(p => {
+                const card = `
+                    <div class="product-card">
+                        <img src="${p.image}" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">${p.name}</h3>
+                            <p class="product-desc">${p.desc}</p>
+                            <div class="product-price">${formatRupiah(p.price)}</div>
+                            <button class="btn-primary" onclick="addToCart(${p.id})">Tambah</button>
+                        </div>
+                    </div>`;
+                document.getElementById(p.category === 'food' ? 'food-grid' : 'copy-grid').innerHTML += card;
+            });
+        };
+
+        const addToCart = (id) => {
+            // Cek jika belum login, lempar ke halaman login
+            if (!currentUser) {
+                alert("Silakan Masuk/Daftar terlebih dahulu sebelum memesan.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const item = cart.find(i => i.id === id);
+            item ? item.qty++ : cart.push({ ...products.find(p => p.id === id), qty: 1 });
+            updateCartUI();
+        };
+
+        const updateQty = (id, change) => {
+            const idx = cart.findIndex(i => i.id === id);
+            if (idx > -1) { cart[idx].qty += change; if(cart[idx].qty <= 0) cart.splice(idx, 1); updateCartUI(); }
+        };
+
+        const updateCartUI = () => {
+            const container = document.getElementById('cart-items-container');
+            let total = 0, items = 0; container.innerHTML = '';
+            
+            cart.forEach(item => {
+                total += item.price * item.qty; items += item.qty;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div><b>${item.name}</b><br><small style="color: var(--text-muted);">${formatRupiah(item.price)}</small></div>
+                        <div class="qty-control"><button class="qty-btn" onclick="updateQty(${item.id}, -1)">-</button>${item.qty}<button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button></div>
+                    </div>`;
+            });
+            document.getElementById('cart-badge').innerText = items;
+            document.getElementById('cart-total-price').innerText = formatRupiah(total);
+        };
+
+        const toggleModal = (id) => document.getElementById(id).classList.toggle('active');
+
+        const processCheckout = () => {
+            if (cart.length === 0) return alert("Keranjang kosong!");
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+
+            const adminWA = "6281234567890"; // Ganti dengan Nomor WA Admin
+            const notes = document.getElementById('buyer-notes').value;
+            
+            let msg = `*INVOICE JTS*%0A%0A👤 Nama: ${currentUser.name}%0A🏫 Kelas: ${currentUser.kelas}%0A%0A*Pesanan:*%0A`;
+            let total = 0;
+            cart.forEach((i, idx) => {
+                total += i.price * i.qty;
+                msg += `${idx+1}. ${i.name} (${i.qty}x) = ${formatRupiah(i.price * i.qty)}%0A`;
+            });
+
+            msg += `%0A*Total: ${formatRupiah(total)}*%0A`;
+            if (notes) msg += `%0A*Catatan:* ${notes}%0A`;
+
+            window.open(`https://wa.me/${adminWA}?text=${msg}`, '_blank');
+        };
+
+        checkAuthStatus(); renderProducts();
+    </script>
+</body>
+</html>
